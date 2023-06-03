@@ -76,7 +76,7 @@ export default function Home() {
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
-              <h3 className="text-xl font-bold text-black">🦾 fastpixels</h3>
+              <h3 className="text-xl font-bold text-black">🦾 flowbolo</h3>
             </a>
           </div>
           <div className="flex lg:hidden">
