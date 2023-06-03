@@ -1,56 +1,55 @@
-"use client"; // this is a client component 👈🏽
+"use client" // this is a client component 👈🏽
 
-import Image from "next/image";
-import { useState, useMemo } from "react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
-import MicRecorder from "mic-recorder-to-mp3";
+import Image from "next/image"
+import { useState, useMemo } from "react"
+import { Bars3Icon } from "@heroicons/react/24/outline"
 
 export default function Home() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const [audio, setAudio] = useState<string>("");
-  const [isRecording, setIsRecording] = useState(false);
-  const [blobURL, setBlobURL] = useState("");
-  const [transcript, setTranscript] = useState();
-  const [isBlocked, setIsBlocked] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [audio, setAudio] = useState<string>("")
+  const [isRecording, setIsRecording] = useState(false)
+  const [blobURL, setBlobURL] = useState("")
+  const [transcript, setTranscript] = useState()
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const recorder = useMemo(() => new MicRecorder({ bitRate: 128 }), []);
+  // const recorder = useMemo(() => new MicRecorder({ bitRate: 128 }), []);
 
   const startRecording = () => {
     if (isBlocked) {
-      console.log("Permission Denied");
-      setIsBlocked(true);
+      console.log("Permission Denied")
+      setIsBlocked(true)
     } else {
-      recorder
-        .start()
-        .then(() => {
-          setIsRecording(true);
-        })
-        .catch((e: React.ChangeEvent<HTMLInputElement>) => console.error(e));
+      //   recorder
+      //     .start()
+      //     .then(() => {
+      //       setIsRecording(true);
+      //     })
+      //     .catch((e: React.ChangeEvent<HTMLInputElement>) => console.error(e));
     }
-  };
+  }
 
   const stopRecording = async () => {
-    console.log("Stopping recording...");
+    console.log("Stopping recording...")
     try {
-      setIsRecording(false);
-      const [buffer, blob]: [any, Blob] = await recorder.stop().getMp3();
+      setIsRecording(false)
+      const [buffer, blob]: [any, Blob] = await recorder.stop().getMp3()
       const audioFile: File = new File([buffer], "audio.mp3", {
         type: blob.type,
         lastModified: Date.now(),
-      });
+      })
       // setBlobURL(URL.createObjectURL(audioFile))
       // // Convert to base64
       // const base64String = await convertBlobToBase64(file)
       // setAudio(base64String)
-      console.log("Sending audio to whisper...");
+      console.log("Sending audio to whisper...")
 
-      setLoading(true);
-      console.log("file: ", audioFile);
-      const formData = new FormData();
-      formData.append("file", blob, "audio.mp3");
-      console.log("formData: ", formData);
+      setLoading(true)
+      console.log("file: ", audioFile)
+      const formData = new FormData()
+      formData.append("file", blob, "audio.mp3")
+      console.log("formData: ", formData)
 
       const response = await fetch("/api/transcribe", {
         method: "POST",
@@ -58,45 +57,45 @@ export default function Home() {
           "Content-Type": `multipart/form-data`,
         },
         body: formData,
-      });
-      console.log("response: ", response);
+      })
+      console.log("response: ", response)
 
-      const data = await response.json();
-      setLoading(false);
-      const transcript = data.modelOutputs[0].text;
-      setTranscript(transcript);
-      console.log("Transcript: ", transcript);
+      const data = await response.json()
+      setLoading(false)
+      const transcript = data.modelOutputs[0].text
+      setTranscript(transcript)
+      console.log("Transcript: ", transcript)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   const convertBlobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
+      const reader = new FileReader()
+      reader.readAsDataURL(blob)
       reader.onloadend = () => {
-        const base64data = reader.result as string | null | undefined;
+        const base64data = reader.result as string | null | undefined
         if (!base64data) {
-          reject(new Error("Failed to convert blob to base64"));
+          reject(new Error("Failed to convert blob to base64"))
         } else {
-          const base64String = base64data.split(",")[1];
-          resolve(base64String);
+          const base64String = base64data.split(",")[1]
+          resolve(base64String)
         }
-      };
+      }
       reader.onerror = () => {
-        reject(new Error("Failed to convert blob to base64"));
-      };
-    });
-  };
+        reject(new Error("Failed to convert blob to base64"))
+      }
+    })
+  }
 
   const handleRecordButtonClick = () => {
     if (isRecording) {
-      stopRecording();
+      stopRecording()
     } else {
-      startRecording();
+      startRecording()
     }
-  };
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-end justify-end p-8 bg-white">
@@ -198,5 +197,5 @@ export default function Home() {
         </div>
       </div>
     </main>
-  );
+  )
 }
