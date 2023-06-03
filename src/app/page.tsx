@@ -30,45 +30,45 @@ export default function Home() {
     }
   }
 
-  const stopRecording = async () => {
-    console.log("Stopping recording...")
-    try {
-      setIsRecording(false)
-      const [buffer, blob]: [any, Blob] = await recorder.stop().getMp3()
-      const audioFile: File = new File([buffer], "audio.mp3", {
-        type: blob.type,
-        lastModified: Date.now(),
-      })
-      // setBlobURL(URL.createObjectURL(audioFile))
-      // // Convert to base64
-      // const base64String = await convertBlobToBase64(file)
-      // setAudio(base64String)
-      console.log("Sending audio to whisper...")
+  // const stopRecording = async () => {
+  //   console.log("Stopping recording...")
+  //   try {
+  //     setIsRecording(false)
+  //     const [buffer, blob]: [any, Blob] = await recorder.stop().getMp3()
+  //     const audioFile: File = new File([buffer], "audio.mp3", {
+  //       type: blob.type,
+  //       lastModified: Date.now(),
+  //     })
+  //     // setBlobURL(URL.createObjectURL(audioFile))
+  //     // // Convert to base64
+  //     // const base64String = await convertBlobToBase64(file)
+  //     // setAudio(base64String)
+  //     console.log("Sending audio to whisper...")
 
-      setLoading(true)
-      console.log("file: ", audioFile)
-      const formData = new FormData()
-      formData.append("file", blob, "audio.mp3")
-      console.log("formData: ", formData)
+  //     setLoading(true)
+  //     console.log("file: ", audioFile)
+  //     const formData = new FormData()
+  //     formData.append("file", blob, "audio.mp3")
+  //     console.log("formData: ", formData)
 
-      const response = await fetch("/api/transcribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": `multipart/form-data`,
-        },
-        body: formData,
-      })
-      console.log("response: ", response)
+  //     const response = await fetch("/api/transcribe", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": `multipart/form-data`,
+  //       },
+  //       body: formData,
+  //     })
+  //     console.log("response: ", response)
 
-      const data = await response.json()
-      setLoading(false)
-      const transcript = data.modelOutputs[0].text
-      setTranscript(transcript)
-      console.log("Transcript: ", transcript)
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  //     const data = await response.json()
+  //     setLoading(false)
+  //     const transcript = data.modelOutputs[0].text
+  //     setTranscript(transcript)
+  //     console.log("Transcript: ", transcript)
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   const convertBlobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -91,7 +91,7 @@ export default function Home() {
 
   const handleRecordButtonClick = () => {
     if (isRecording) {
-      stopRecording()
+      // stopRecording()
     } else {
       startRecording()
     }
