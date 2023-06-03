@@ -55,7 +55,7 @@ export default function Login() {
       <div className="flex flex-col justify-center flex-1 min-h-screen py-12 bg-white sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="text-3xl font-bold text-center text-black">
-            🦾 fastflows
+            🦾 flowbolo
           </h2>
           <h2 className="mt-1 font-bold leading-9 tracking-tight text-center text-gray-600">
             Sign in to your account
