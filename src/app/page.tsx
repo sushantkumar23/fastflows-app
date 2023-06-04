@@ -68,20 +68,17 @@ export default function Home() {
     console.log("prompt: ", prompt)
 
     // Call the Prompt API
-    const response = await fetch(
-      `${API_BASE_URL}/piechart/schema?prompt=${prompt}&`,
-      {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${session}`,
-        },
-        body: JSON.stringify({
-          prompt,
-          latest_schema: currentJSONSchema,
-        }),
-      }
-    )
+    const response = await fetch(`${API_BASE_URL}/piechart/schema`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${session}`,
+      },
+      body: JSON.stringify({
+        prompt,
+        latest_schema: currentJSONSchema,
+      }),
+    })
 
     if (response.ok) {
       const response_json = await response.json()
