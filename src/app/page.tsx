@@ -14,6 +14,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { isLoggedIn, session, logout } = useSession()
   const [currentChart, setCurrentChart] = useState<string>("pie")
+  const [currentJSONSchema, setCurrentJSONSchema] = useState<string>("")
   const [prompt, setPrompt] = useState<string>("")
   const [previousPrompts, setPreviousPrompts] = useState<string[]>([])
   const router = useRouter()
@@ -68,19 +69,25 @@ export default function Home() {
 
     // Call the Prompt API
     const response = await fetch(
-      `${API_BASE_URL}/piechart/schema?prompt=${prompt}`,
+      `${API_BASE_URL}/piechart/schema?prompt=${prompt}&`,
       {
-        method: "GET",
+        method: "POST",
         headers: {
+          "Content-type": "application/json",
           Authorization: `Bearer ${session}`,
         },
+        body: JSON.stringify({
+          prompt,
+          latest_schema: currentJSONSchema,
+        }),
       }
     )
 
     if (response.ok) {
       const response_json = await response.json()
       const data = response_json.data
-      setCurrentChart(data)
+      setCurrentChart(data.schema)
+      setCurrentJSONSchema(data.json)
       setPreviousPrompts((previousPrompts) => [...previousPrompts, prompt])
       setPrompt("")
     }
@@ -125,7 +132,7 @@ export default function Home() {
         </div>
         <div className="w-1/3 px-6 mx-auto lg:px-8">
           <div className="max-w-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            <h2 className="inline text-2xl sm:block">Create your flowchart</h2>{" "}
+            <h2 className="inline text-2xl sm:block">Create your chart</h2>{" "}
             <p className="inline sm:block"></p>
           </div>
           <div className="mt-8">
@@ -146,8 +153,11 @@ export default function Home() {
               ))}
             </select>
           </div>
-          {previousPrompts.map((prompt) => (
-            <div className="relative flex items-center px-6 py-5 mt-10 space-x-3 bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
+          {previousPrompts.map((prompt, index) => (
+            <div
+              key={index}
+              className="relative flex items-center px-6 py-5 mt-10 space-x-3 bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
+            >
               <div className="flex-shrink-0">
                 <img
                   className="w-10 h-10 rounded-full"
@@ -159,7 +169,7 @@ export default function Home() {
                 <a href="#" className="focus:outline-none">
                   <span className="absolute inset-0" aria-hidden="true" />
                   <p className="text-sm font-medium text-gray-900">
-                    Sourasis Roy
+                    Amelia Harper
                   </p>
                   <p className="text-sm text-gray-500">{prompt}</p>
                 </a>

@@ -23,7 +23,7 @@ const MermaidChart: React.FC<MermaidChartProps> = ({ chart }) => {
     }
   }
 
-  return <div ref={containerRef} />
+  return <div className="w-full" ref={containerRef} />
 }
 
 export default MermaidChart
