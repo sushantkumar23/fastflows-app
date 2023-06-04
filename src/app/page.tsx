@@ -13,18 +13,15 @@ import { API_BASE_URL } from "@/config"
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { isLoggedIn, session, logout } = useSession()
+  const [currentChart, setCurrentChart] = useState<string>("pie")
   const [prompt, setPrompt] = useState<string>("")
+  const [previousPrompts, setPreviousPrompts] = useState<string[]>([])
   const router = useRouter()
 
   const options = ["Piechart", "Flowchart"]
 
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder()
-
-  const chart = `graph TD
-      A[Client] --> B[Load Balancer]
-      B --> C[Server01]
-      B --> D[Server02]`
 
   const getTranscript = async (formData: FormData) => {
     const response = await fetch(`${API_BASE_URL}/transcribe/`, {
@@ -66,6 +63,29 @@ export default function Home() {
     }
   }
 
+  const handlePromptSubmitClick = async () => {
+    console.log("prompt: ", prompt)
+
+    // Call the Prompt API
+    const response = await fetch(
+      `${API_BASE_URL}/piechart/schema?prompt=${prompt}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session}`,
+        },
+      }
+    )
+
+    if (response.ok) {
+      const response_json = await response.json()
+      const data = response_json.data
+      setCurrentChart(data)
+      setPreviousPrompts((previousPrompts) => [...previousPrompts, prompt])
+      setPrompt("")
+    }
+  }
+
   return (
     <main className="flex flex-col items-end justify-end min-h-screen p-8 bg-white">
       <header className="absolute inset-x-0 top-0 z-50 shadow-lg">
@@ -101,7 +121,7 @@ export default function Home() {
       </header>
       <div className="flex w-full py-16 bg-white sm:py-24 lg:py-32">
         <div className="flex items-center justify-center w-2/3">
-          <MermaidChart chart={chart} />
+          <MermaidChart chart={currentChart} />
         </div>
         <div className="w-1/3 px-6 mx-auto lg:px-8">
           <div className="max-w-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -126,28 +146,26 @@ export default function Home() {
               ))}
             </select>
           </div>
-          <div className="relative flex items-center px-6 py-5 mt-10 space-x-3 bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
-            <div className="flex-shrink-0">
-              <img
-                className="w-10 h-10 rounded-full"
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt=""
-              />
+          {previousPrompts.map((prompt) => (
+            <div className="relative flex items-center px-6 py-5 mt-10 space-x-3 bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
+              <div className="flex-shrink-0">
+                <img
+                  className="w-10 h-10 rounded-full"
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt=""
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <a href="#" className="focus:outline-none">
+                  <span className="absolute inset-0" aria-hidden="true" />
+                  <p className="text-sm font-medium text-gray-900">
+                    Sourasis Roy
+                  </p>
+                  <p className="text-sm text-gray-500">{prompt}</p>
+                </a>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <a href="#" className="focus:outline-none">
-                <span className="absolute inset-0" aria-hidden="true" />
-                <p className="text-sm font-medium text-gray-900">
-                  Sourasis Roy
-                </p>
-                <p className="text-sm text-gray-500">
-                  Please create a flowchart that can manage inventory stored in
-                  DynamoDB and handles both the transaction failures and
-                  transaction succeeds scenarios.
-                </p>
-              </a>
-            </div>
-          </div>
+          ))}
           <div className="mt-10">
             <div className="flex gap-x-4">
               <label htmlFor="email-address" className="sr-only">
@@ -175,7 +193,10 @@ export default function Home() {
               </button>
             </div>
             <div className="w-full mt-4">
-              <button className="w-full flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              <button
+                onClick={handlePromptSubmitClick}
+                className="w-full flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
                 Submit
               </button>
             </div>
